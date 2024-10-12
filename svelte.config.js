@@ -19,10 +19,10 @@ const config = {
 			fallback: '200.html',
 			precompress: false,
 			strict: true
-		}),
-		paths: {
-			base: process.env.NODE_ENV === 'production' ? '/how_and_why' : ''
-		}
+		})
+		// paths: {
+		// 	base: process.env.NODE_ENV === 'production' ? '/how_and_why' : ''
+		// }
 	}
 };
 
