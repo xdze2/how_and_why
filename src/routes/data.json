@@ -1,0 +1,6 @@
+{
+    "whats": [
+        {"uid": "a_van","description": "a van"},
+        {"uid": "camp","description": "camp"}
+    ]
+}
