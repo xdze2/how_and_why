@@ -1,42 +1,52 @@
 <script>
+	import { text } from '@sveltejs/kit';
 	import { v4 as uuidv4 } from 'uuid';
 
-	let data = [
+	let what_data = [
 		{
 			text: 'Write my first post',
-			uid: 'a5bbaaba-7c00-46dc-ad5a-f13bf035922d',
-			hows: ['a5bbaaba-7c00-11dc-ad5a-f13bf035922d', '1011aaba-7c00-01dc-115a-f13bf035922d'],
-			whys: ['a5bbaaba-7c00-01dc-ad5a-f13bf035922d']
+			uid: 'a5bbaaba-7c00-46dc-ad5a-f13bf035922d'
 		},
-		{ text: 'Upload the post to the blog', uid: 'a5bbaaba-7c00-11dc-ad5a-f13bf035922d', hows: [] },
+		{ text: 'Upload the post to the blog', uid: 'a5bbaaba-7c00-11dc-ad5a-f13bf035922d' },
 		{ text: 'Publish the post at Facebook', uid: 'a5bbaaba-7c00-01dc-ad5a-f13bf035922d' },
 		{
 			text: 'Build a Van',
-			uid: '1011aaba-7c00-01dc-115a-f13bf035922d',
-			hows: ['a5bbaaba-7c00-01dc-ad5a-f13bf035922d']
+			description: 'I want to build a van',
+			uid: '1011aaba-7c00-01dc-115a-f13bf035922d'
 		}
 	];
+	let what_to_hows = [
+		{ what: '1011aaba-7c00-01dc-115a-f13bf035922d', how: 'a5bbaaba-7c00-01dc-ad5a-f13bf035922d' },
+		{ what: 'a5bbaaba-7c00-46dc-ad5a-f13bf035922d', how: 'a5bbaaba-7c00-11dc-ad5a-f13bf035922d' },
+		{ what: 'a5bbaaba-7c00-46dc-ad5a-f13bf035922d', how: '1011aaba-7c00-01dc-115a-f13bf035922d' }
+	];
 
+	let modified_text = '';
 	let selected_uid = 'a5bbaaba-7c00-46dc-ad5a-f13bf035922d';
-	$: data_selected = data.find((item) => item.uid === selected_uid);
-	$: hows_selected = (data_selected.hows ?? []).map((uid) => data.find((item) => item.uid === uid));
-	$: whys_selected = (data_selected.whys ?? []).map((uid) => data.find((item) => item.uid === uid));
+	$: data_selected = what_data.find((item) => item.uid === selected_uid);
+	$: hows_selected = what_to_hows
+		.filter((link) => link.what === selected_uid)
+		.map((link) => what_data.find((item) => item.uid === link.how));
+	$: whys_selected = what_to_hows
+		.filter((link) => link.how === selected_uid)
+		.map((link) => what_data.find((item) => item.uid === link.what));
 
 	let newItem = '';
 	function addWhy() {
-		data = [...data, { text: newItem, uid: uuidv4(), hows: [selected_uid] }];
+		console.log('hhello');
+		let new_id = uuidv4();
+		what_data.push({ text: newItem, uid: new_id, description: '' });
+		what_data = what_data;
+		what_to_hows.push({ what: uuidv4(), how: data_selected.uid });
+		what_to_hows = what_to_hows;
 		newItem = '';
-	}
-
-	function removeFromList(index) {
-		data.splice(index, 1);
-		data = data;
+		selected_uid = new_id;
 	}
 </script>
 
 <p>
 	<select bind:value={selected_uid}>
-		{#each data as what}
+		{#each what_data as what}
 			<option value={what.uid}>{what.text}</option>
 		{/each}
 	</select>
@@ -54,8 +64,9 @@
 
 <h3>What</h3>
 <div class="selected_what">
-	<h2>{data_selected.text}</h2>
-	{data_selected?.uid}
+	<h2 contenteditable bind:textContent={data_selected.text}>{data_selected.text}</h2>
+	<span class="uid">{data_selected?.uid}</span> <br />
+	<textarea bind:value={data_selected.description} />
 </div>
 
 <h3>How</h3>
@@ -66,7 +77,8 @@
 	</div>
 {/each}
 
-<pre>{JSON.stringify(data, null, 2)}</pre>
+<pre>{JSON.stringify(what_data, null, 2)}</pre>
+<pre>{JSON.stringify(what_to_hows, null, 2)}</pre>
 
 <style>
 	.selected_what {
@@ -81,5 +93,14 @@
 		padding: 5px;
 		background-color: #faf8f9;
 		margin-bottom: 5px;
+	}
+	.uid {
+		font-size: 80%;
+		color: grey;
+	}
+	textarea {
+		width: 100%;
+		margin: 4px;
+		height: 150px;
 	}
 </style>
